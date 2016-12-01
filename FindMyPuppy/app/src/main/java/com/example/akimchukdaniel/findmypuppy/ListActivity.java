@@ -31,7 +31,7 @@ public class ListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.puppy_list);
         puppyList = new ArrayList<>();
-        initData();
+        //initData();
         initializePuppyList();
 
         final ArrayAdapter<String> mPuppyAdapter =
@@ -83,7 +83,7 @@ public class ListActivity extends Activity {
             }
         }
     }
-
+/*
     public void initData() {
         LostPuppyDbHelper dbHelper = new LostPuppyDbHelper(this);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -106,7 +106,7 @@ public class ListActivity extends Activity {
         values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_SEX, "male");
 
         long newRowId = db.insert(LostPuppy.LostPuppyEntry.TABLE_NAME, null, values);
-    }
+    }*/
 
     public static byte[] getBytes(Object obj) throws java.io.IOException{
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
