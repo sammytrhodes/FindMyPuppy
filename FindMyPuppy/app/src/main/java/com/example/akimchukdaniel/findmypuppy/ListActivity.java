@@ -2,10 +2,13 @@ package com.example.akimchukdaniel.findmypuppy;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -25,7 +28,7 @@ import java.sql.Date;
 public class ListActivity extends Activity {
 
     ListView listView;
-    List<String> puppyList;
+    List<Integer> puppyList;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,8 +37,8 @@ public class ListActivity extends Activity {
         //initData();
         initializePuppyList();
 
-        final ArrayAdapter<String> mPuppyAdapter =
-                new ArrayAdapter<String>(
+        final ArrayAdapter<Integer> mPuppyAdapter =
+                new ArrayAdapter<Integer>(
                         this,
                         R.layout.puppy_list_item,
                         R.id.list_item_puppy_textview,
@@ -44,6 +47,15 @@ public class ListActivity extends Activity {
 
         listView = (ListView) findViewById(R.id.listView);
         listView.setAdapter(mPuppyAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(getApplicationContext(), PuppyDetailActivity.class);
+                intent.putExtra("id", mPuppyAdapter.getItem(i));
+                startActivity(intent);
+            }
+
+        });
 
     }
 
@@ -77,9 +89,9 @@ public class ListActivity extends Activity {
         );
 
         if (c.moveToFirst()) {
-            puppyList.add(c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_NAME)));
+            puppyList.add(c.getInt(c.getColumnIndex(LostPuppy.LostPuppyEntry._ID)));
             while (c.moveToNext()) {
-                puppyList.add(c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_NAME)));
+                puppyList.add(c.getInt(c.getColumnIndex(LostPuppy.LostPuppyEntry._ID)));
             }
         }
     }
