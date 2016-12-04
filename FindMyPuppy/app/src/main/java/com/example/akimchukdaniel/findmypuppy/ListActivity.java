@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -56,7 +58,6 @@ public class ListActivity extends Activity {
             }
 
         });
-
     }
 
     public void initializePuppyList() {
@@ -120,14 +121,28 @@ public class ListActivity extends Activity {
         long newRowId = db.insert(LostPuppy.LostPuppyEntry.TABLE_NAME, null, values);
     }*/
 
-    public static byte[] getBytes(Object obj) throws java.io.IOException{
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(obj);
-        oos.flush();
-        oos.close();
-        bos.close();
-        byte [] data = bos.toByteArray();
-        return data;
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.my, menu);
+        return true;
     }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.add:
+                Intent intent = new Intent(this, MakeReport.class);
+                startActivity(intent);
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
 }
