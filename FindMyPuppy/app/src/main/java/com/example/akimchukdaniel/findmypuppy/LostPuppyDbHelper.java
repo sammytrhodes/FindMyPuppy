@@ -19,14 +19,14 @@ public class LostPuppyDbHelper extends SQLiteOpenHelper {
                     LostPuppyEntry.COLUMN_NAME_BREED + " TEXT," +
                     LostPuppyEntry.COLUMN_NAME_FUR_COLOR + " TEXT," +
                     LostPuppyEntry.COLUMN_NAME_EYE + " TEXT," +
-                    LostPuppyEntry.COLUMN_NAME_LAST_LOCATION + " BLOB," +
-                    LostPuppyEntry.COLUMN_NAME_LAST_TIME + " BLOB )";
+                    LostPuppyEntry.COLUMN_NAME_LAST_LOCATION + " TEXT," +
+                    LostPuppyEntry.COLUMN_NAME_LAST_TIME + " TEXT )";
 
     private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + LostPuppyEntry.TABLE_NAME;
 
 
     public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "LostPuppies.db";
+    public static final String DATABASE_NAME = "LostPuppiesNEW2.db";
 
 
     public LostPuppyDbHelper(Context context) {
