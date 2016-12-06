@@ -77,10 +77,12 @@ public class MakeReport extends Activity {
         values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_EYE, eye.getText().toString());
         values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_FUR_COLOR, fur.getText().toString());
 
-
+        String locStr = location.getLatLng().latitude + "," + location.getLatLng().longitude;
+        String dateString = date.getMonth() + "," + date.getDayOfMonth() + "," + date.getYear();
         try {
-            values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_LOCATION, getBytes(location.getLatLng()));
-            values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME, getBytes(new Date(date.getYear(), date.getMonth(), date.getDayOfMonth())));
+            values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_LOCATION, locStr); //TODO: THIS TOSTRING DOESNT DO WHAT WE NEED
+            System.out.println(location.getLatLng().toString());
+            values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME, dateString);
         } catch (Exception e) {
 
         }
@@ -91,15 +93,6 @@ public class MakeReport extends Activity {
         long newRowId = db.insert(LostPuppy.LostPuppyEntry.TABLE_NAME, null, values);
         finish();
     }
-    public static byte[] getBytes(Object obj) throws java.io.IOException{
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(obj);
-        oos.flush();
-        oos.close();
-        bos.close();
-        byte [] data = bos.toByteArray();
-        return data;
-    }
+
 }
 
