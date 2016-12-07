@@ -26,13 +26,14 @@ public class PuppyDetailActivity extends Activity implements OnMapReadyCallback 
     TextView nameTextView;
     MapFragment mapFragment;
     LatLng location;
+    String name;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.puppy_detail);
         Intent intent = getIntent();
         int id = intent.getIntExtra("id", -1);
-        String name = intent.getStringExtra("name");
+        name = intent.getStringExtra("name");
         String[] locationStr = intent.getStringExtra("location").split(",");
 
         location = new LatLng(Double.parseDouble(locationStr[0]), Double.parseDouble(locationStr[1]));
@@ -46,13 +47,15 @@ public class PuppyDetailActivity extends Activity implements OnMapReadyCallback 
         mapFragment.getMapAsync(this);
 
         nameTextView = (TextView) findViewById(R.id.name);
-        nameTextView.setText(name + ", " + location + ", " + date);
-    }
+        nameTextView.setText(intent.getStringExtra("lostfound") + "\n" + name +  "\nBreed: " + intent.getStringExtra("breed") + "\nFur Color: "
+                + intent.getStringExtra("fur") + "\nDate Last Seen: " + date + "\nSex: " + intent.getStringExtra("sex")
+                + "\nEye Color: " + intent.getStringExtra("eye"));
+}
 
     public void onMapReady(GoogleMap map) {
         map.addMarker(new MarkerOptions()
                 .position(location)
-                .title("Marker"));
+                .title(name));
 
         CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(location, 8);
         map.moveCamera(cu);

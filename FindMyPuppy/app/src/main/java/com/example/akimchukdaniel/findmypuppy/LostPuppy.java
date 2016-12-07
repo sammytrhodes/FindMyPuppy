@@ -20,12 +20,13 @@ public class LostPuppy {
     private String sex;
     private String eye;
     private int id;
+    private String lostfound;
 
     private LostPuppy() {
 
     }
 
-    public LostPuppy(int id, String name, String breed, String fur, LatLng location, java.util.Date date, String sex, String eye) {
+    public LostPuppy(int id, String name, String breed, String fur, LatLng location, java.util.Date date, String sex, String eye, String lostfound) {
         this.id = id;
         this.name = name;
         this.breed = breed;
@@ -34,6 +35,7 @@ public class LostPuppy {
         this.date = date;
         this.sex = sex;
         this.eye = eye;
+        this.lostfound = lostfound;
     }
 
     public int getId() {return id;}
@@ -44,6 +46,7 @@ public class LostPuppy {
     public java.util.Date getDate() {return date;}
     public String getSex() {return sex;}
     public String getEye() {return eye;}
+    public String getLostfound() {return lostfound;}
 
     public static class LostPuppyEntry implements BaseColumns {
         public static final String TABLE_NAME = "lost_puppies";
@@ -54,9 +57,10 @@ public class LostPuppy {
         public static final String COLUMN_NAME_LAST_TIME= "last_seen_time";
         public static final String COLUMN_NAME_SEX= "sex";
         public static final String COLUMN_NAME_EYE= "eye_color";
+        public static final String COLUMN_NAME_LOSTFOUND= "lostfound";
     }
 
     public String toString() {
-        return name + ", " + breed;
+        return lostfound + ": " + name + ", " + breed;
     }
 }
