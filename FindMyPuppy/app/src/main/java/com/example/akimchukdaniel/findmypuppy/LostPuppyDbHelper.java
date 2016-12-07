@@ -14,6 +14,7 @@ public class LostPuppyDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + LostPuppyEntry.TABLE_NAME + " (" +
                     LostPuppyEntry._ID + " INTEGER PRIMARY KEY," +
+                    LostPuppyEntry.COLUMN_NAME_LOSTFOUND + " TEXT," +
                     LostPuppyEntry.COLUMN_NAME_NAME + " TEXT," +
                     LostPuppyEntry.COLUMN_NAME_SEX + " TEXT," +
                     LostPuppyEntry.COLUMN_NAME_BREED + " TEXT," +
@@ -26,7 +27,7 @@ public class LostPuppyDbHelper extends SQLiteOpenHelper {
 
 
     public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "LostPuppiesNEW2.db";
+    public static final String DATABASE_NAME = "LostPuppiesNEWwithlostfound.db";
 
 
     public LostPuppyDbHelper(Context context) {

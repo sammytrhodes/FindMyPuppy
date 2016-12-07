@@ -2,23 +2,31 @@ package com.example.akimchukdaniel.findmypuppy;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.SearchView;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.Date;
@@ -31,22 +39,52 @@ public class ListActivity extends Activity {
 
     ListView listView;
     List<LostPuppy> puppyList;
+    boolean cameFromMap = false;
+    Menu menu;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.puppy_list);
         //initData();
         listView = (ListView) findViewById(R.id.listView);
-        initializePuppyList();
+        initializePuppyList(new String[]{""});
+        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        /*
+        if (preferences.getString("defaultView", "list").equals("map") && !cameFromMap) {
+            Intent intent = new Intent(this, MapsActivity.class);
+            cameFromMap = true;
+            startActivity(intent);
+        }*/
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        initializePuppyList();
+        initializePuppyList(new String[]{""});
+        LinearLayout layout = (LinearLayout) findViewById(R.id.listLayout);
+        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+
+        switch (preferences.getString("bgColor", "white")) {
+            case "white":
+                layout.setBackgroundColor(getResources().getColor(R.color.white));
+                break;
+            case "magenta":
+                layout.setBackgroundColor(getResources().getColor(R.color.magenta));
+                break;
+            case "blue":
+                layout.setBackgroundColor(getResources().getColor(R.color.blue));
+                break;
+            case "orange":
+                layout.setBackgroundColor(getResources().getColor(R.color.orange));
+                break;
+            case "green":
+                layout.setBackgroundColor(getResources().getColor(R.color.green));
+                break;
+        }
     }
 
-    public void initializePuppyList() {
+    public void initializePuppyList(String[] query) {
         puppyList = new ArrayList<>();
         final ArrayAdapter<LostPuppy> mPuppyAdapter =
                 new ArrayAdapter<LostPuppy>(
@@ -67,7 +105,8 @@ public class ListActivity extends Activity {
                 LostPuppy.LostPuppyEntry.COLUMN_NAME_FUR_COLOR,
                 LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_LOCATION,
                 LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME,
-                LostPuppy.LostPuppyEntry.COLUMN_NAME_EYE
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_EYE,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND
         };
 
         String selection = LostPuppy.LostPuppyEntry.COLUMN_NAME_NAME + " != ?";
@@ -94,6 +133,7 @@ public class ListActivity extends Activity {
             String dateStr = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME));
             String sex = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_SEX));
             String eye = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_EYE));
+            String lostfound = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND));
 
             LatLng location = new LatLng(0, 0);
             if (locStr != null) {
@@ -102,15 +142,28 @@ public class ListActivity extends Activity {
             Date date = new Date(0);
             if (dateStr != null) {
                 String[] dateArray = dateStr.split(",");
-                date = new Date(Integer.parseInt(dateArray[2]), Integer.parseInt(dateArray[0]), Integer.parseInt(dateArray[1]));
+                date = new Date(Integer.parseInt(dateArray[2]) - 1900, Integer.parseInt(dateArray[0]), Integer.parseInt(dateArray[1]));
             }
 
-            puppyList.add(new LostPuppy(id, name, breed, fur, location, date, sex, eye));
+            LostPuppy thePuppy = new LostPuppy(id, name, breed, fur, location, date, sex, eye, lostfound);
+
+            boolean notInList = false;
+            for (String s : query) {
+                if (!thePuppy.toString().toLowerCase().contains(s.toLowerCase())){
+                    notInList = true;
+                    break;
+                }
+            }
+            if (!notInList) {
+                puppyList.add(thePuppy);
+            }
             while (c.moveToNext()) {
                 id = c.getInt(c.getColumnIndex(LostPuppy.LostPuppyEntry._ID));
                 name = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_NAME));
                 breed = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_BREED));
                 fur = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_FUR_COLOR));
+                dateStr = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME));
+                locStr = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_LOCATION));
 
                 location = new LatLng(0, 0);
                 if (locStr != null) {
@@ -119,13 +172,24 @@ public class ListActivity extends Activity {
                 date = new Date(0);
                 if (dateStr != null) {
                     String[] dateArray = dateStr.split(",");
-                    date = new Date(Integer.parseInt(dateArray[2]), Integer.parseInt(dateArray[0]), Integer.parseInt(dateArray[1]));
+                    date = new Date(Integer.parseInt(dateArray[2]) - 1900, Integer.parseInt(dateArray[0]), Integer.parseInt(dateArray[1]));
                 }
 
 
                 sex = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_SEX));
                 eye = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_EYE));
-                puppyList.add(new LostPuppy(id, name, breed, fur, location, date, sex, eye));
+                lostfound = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND));
+                thePuppy = new LostPuppy(id, name, breed, fur, location, date, sex, eye, lostfound);
+                notInList = false;
+                for (String s : query) {
+                    if (!thePuppy.toString().toLowerCase().contains(s.toLowerCase())){
+                        notInList = true;
+                        break;
+                    }
+                }
+                if (!notInList) {
+                    puppyList.add(thePuppy);
+                }
 
             }
         }
@@ -141,7 +205,9 @@ public class ListActivity extends Activity {
                 intent.putExtra("sex", mPuppyAdapter.getItem(i).getSex());
                 intent.putExtra("eye", mPuppyAdapter.getItem(i).getEye());
                 intent.putExtra("location", mPuppyAdapter.getItem(i).getLocation().latitude + "," + mPuppyAdapter.getItem(i).getLocation().longitude);
-                intent.putExtra("date", mPuppyAdapter.getItem(i).getDate().toString());
+                SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+                intent.putExtra("date", sdf.format(mPuppyAdapter.getItem(i).getDate()));
+                intent.putExtra("lostfound", mPuppyAdapter.getItem(i).getLostfound());
                 startActivity(intent);
 
             }
@@ -179,6 +245,26 @@ public class ListActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.my, menu);
+        this.menu = menu;
+        final SearchView search = (SearchView) menu.findItem(R.id.search).getActionView();
+                search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+                    @Override
+                    public boolean onQueryTextChange(String query) {
+                        initializePuppyList(query.split(" "));
+                        return true;
+
+                    }
+
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(search.getWindowToken(), 0);
+                        return true;
+
+                    }
+
+                });
         return true;
     }
 
@@ -187,6 +273,16 @@ public class ListActivity extends Activity {
             case R.id.add:
                 Intent intent = new Intent(this, MakeReport.class);
                 startActivity(intent);
+                return true;
+
+            case R.id.mapButton:
+                Intent mapsIntent = new Intent(this, MapsActivity.class);
+                startActivity(mapsIntent);
+                return true;
+
+            case R.id.settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
 
             default:
