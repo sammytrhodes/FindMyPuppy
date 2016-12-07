@@ -4,6 +4,8 @@ import android.provider.BaseColumns;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Date;
+
 /**
  * Created by akimchukdaniel on 12/1/16.
  */
@@ -59,6 +61,6 @@ public class LostPuppy {
     }
 
     public String toString() {
-        return lostfound + ": " + name + ", " + fur + " " + breed + ", " + sex;
+        return lostfound + ": " + name + ", " + breed;
     }
 }
