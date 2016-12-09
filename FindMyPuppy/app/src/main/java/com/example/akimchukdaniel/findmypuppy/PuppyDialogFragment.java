@@ -33,6 +33,8 @@ public class PuppyDialogFragment extends DialogFragment {
                         Date date = new Date(Integer.parseInt(dateStr[2]) - 1900, Integer.parseInt(dateStr[0]), Integer.parseInt(dateStr[1]));
                         intent.putExtra("date", sdf.format(date));
                         intent.putExtra("lostfound", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND)));
+                        intent.putExtra("phone", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_PHONE)));
+                        intent.putExtra("reporter", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_REPORTER)));
                         startActivity(intent);
                     }
                 })

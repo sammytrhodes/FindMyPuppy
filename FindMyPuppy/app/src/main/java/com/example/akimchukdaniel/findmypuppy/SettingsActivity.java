@@ -13,7 +13,7 @@ import android.widget.RadioGroup;
  */
 
 public class SettingsActivity extends Activity {
-    EditText name;
+    EditText name, phone;
     RadioGroup bgColor, defaultView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +22,7 @@ public class SettingsActivity extends Activity {
         name = (EditText) findViewById(R.id.nameSetting);
         bgColor = (RadioGroup) findViewById(R.id.backgroundRadio);
         defaultView = (RadioGroup) findViewById(R.id.defaultView);
+        phone = (EditText) findViewById(R.id.phoneSetting);
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.settingsLayout);
         SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
@@ -43,6 +44,14 @@ public class SettingsActivity extends Activity {
                 layout.setBackgroundColor(getResources().getColor(R.color.green));
                 break;
         }
+
+        if (!preferences.getString("name", "").equals("")) {
+            name.setText(preferences.getString("name", ""));
+        }
+
+        if (!preferences.getString("phone", "").equals("")) {
+            phone.setText(preferences.getString("phone", ""));
+        }
     }
 
     @Override
@@ -52,6 +61,7 @@ public class SettingsActivity extends Activity {
         preferences.edit().putString("name", name.getText().toString())
                 .putString("bgColor", ((RadioButton)findViewById(bgColor.getCheckedRadioButtonId())).getContentDescription().toString())
                 .putString("defaultView",((RadioButton)findViewById(defaultView.getCheckedRadioButtonId())).getContentDescription().toString())
+                .putString("phone", phone.getText().toString())
                 .commit();
     }
 }

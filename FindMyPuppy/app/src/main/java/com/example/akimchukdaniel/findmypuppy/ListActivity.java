@@ -106,7 +106,9 @@ public class ListActivity extends Activity {
                 LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_LOCATION,
                 LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME,
                 LostPuppy.LostPuppyEntry.COLUMN_NAME_EYE,
-                LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_PHONE,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_REPORTER
         };
 
         String selection = LostPuppy.LostPuppyEntry.COLUMN_NAME_NAME + " != ?";
@@ -134,6 +136,8 @@ public class ListActivity extends Activity {
             String sex = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_SEX));
             String eye = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_EYE));
             String lostfound = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND));
+            String phone = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_PHONE));
+            String reporter = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_REPORTER));
 
             LatLng location = new LatLng(0, 0);
             if (locStr != null) {
@@ -145,7 +149,7 @@ public class ListActivity extends Activity {
                 date = new Date(Integer.parseInt(dateArray[2]) - 1900, Integer.parseInt(dateArray[0]), Integer.parseInt(dateArray[1]));
             }
 
-            LostPuppy thePuppy = new LostPuppy(id, name, breed, fur, location, date, sex, eye, lostfound);
+            LostPuppy thePuppy = new LostPuppy(id, name, breed, fur, location, date, sex, eye, lostfound, phone, reporter);
 
             boolean notInList = false;
             for (String s : query) {
@@ -164,6 +168,8 @@ public class ListActivity extends Activity {
                 fur = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_FUR_COLOR));
                 dateStr = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME));
                 locStr = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_LOCATION));
+                phone = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_PHONE));
+                reporter = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_REPORTER));
 
                 location = new LatLng(0, 0);
                 if (locStr != null) {
@@ -179,7 +185,7 @@ public class ListActivity extends Activity {
                 sex = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_SEX));
                 eye = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_EYE));
                 lostfound = c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND));
-                thePuppy = new LostPuppy(id, name, breed, fur, location, date, sex, eye, lostfound);
+                thePuppy = new LostPuppy(id, name, breed, fur, location, date, sex, eye, lostfound, phone, reporter);
                 notInList = false;
                 for (String s : query) {
                     if (!thePuppy.toString().toLowerCase().contains(s.toLowerCase())){
@@ -208,6 +214,8 @@ public class ListActivity extends Activity {
                 SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
                 intent.putExtra("date", sdf.format(mPuppyAdapter.getItem(i).getDate()));
                 intent.putExtra("lostfound", mPuppyAdapter.getItem(i).getLostfound());
+                intent.putExtra("phone", mPuppyAdapter.getItem(i).getPhone());
+                intent.putExtra("reporter", mPuppyAdapter.getItem(i).getReporter());
                 startActivity(intent);
 
             }

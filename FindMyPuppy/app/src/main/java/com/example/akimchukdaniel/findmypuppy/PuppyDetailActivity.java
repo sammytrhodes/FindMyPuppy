@@ -47,9 +47,15 @@ public class PuppyDetailActivity extends Activity implements OnMapReadyCallback 
         mapFragment.getMapAsync(this);
 
         nameTextView = (TextView) findViewById(R.id.name);
-        nameTextView.setText(intent.getStringExtra("lostfound") + "\n" + name +  "\nBreed: " + intent.getStringExtra("breed") + "\nFur Color: "
+        String theText = intent.getStringExtra("lostfound") + "\n" + name +  "\nBreed: " + intent.getStringExtra("breed") + "\nFur Color: "
                 + intent.getStringExtra("fur") + "\nDate Last Seen: " + date + "\nSex: " + intent.getStringExtra("sex")
-                + "\nEye Color: " + intent.getStringExtra("eye"));
+                + "\nEye Color: " + intent.getStringExtra("eye") + "\nREPORTED BY:\n" + intent.getStringExtra("reporter") + "\n";
+        if (!intent.getStringExtra("phone").equals("")) {
+            theText += intent.getStringExtra("phone");
+        } else {
+            theText += "No contact info provided";
+        }
+        nameTextView.setText(theText);
 }
 
     public void onMapReady(GoogleMap map) {

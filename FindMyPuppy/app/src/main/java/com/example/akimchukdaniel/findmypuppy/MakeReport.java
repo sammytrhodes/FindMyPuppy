@@ -137,6 +137,12 @@ public class MakeReport extends Activity {
                 break;
         }
 
+        SharedPreferences sp = getSharedPreferences("preferences", MODE_PRIVATE);
+        values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_PHONE, sp.getString("phone", ""));
+        values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_REPORTER, sp.getString("name", "Anonymous"));
+
+
+
 
         long newRowId = db.insert(LostPuppy.LostPuppyEntry.TABLE_NAME, null, values);
         finish();
@@ -155,7 +161,9 @@ public class MakeReport extends Activity {
                 LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_LOCATION,
                 LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME,
                 LostPuppy.LostPuppyEntry.COLUMN_NAME_EYE,
-                LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_PHONE,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_REPORTER
         };
 
         String selection = LostPuppy.LostPuppyEntry.COLUMN_NAME_NAME + " == ? AND " +
