@@ -1,8 +1,14 @@
 package com.example.akimchukdaniel.findmypuppy;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.ContentValues;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -23,6 +29,7 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static android.content.ContentValues.TAG;
@@ -38,6 +45,7 @@ public class MakeReport extends Activity {
     Place location;
     DatePicker date;
     Button submit;
+    Cursor c;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +100,14 @@ public class MakeReport extends Activity {
     }
 
     public void submit(View view) {
+        if (isMatch()) {
+            PuppyDialogFragment dialogFragment = new PuppyDialogFragment();
+            dialogFragment.show(getFragmentManager(), "We found a puppy!!");
+            return;
+        }
+
+
+
         LostPuppyDbHelper dbHelper = new LostPuppyDbHelper(this);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -104,7 +120,6 @@ public class MakeReport extends Activity {
         String dateString = date.getMonth() + "," + date.getDayOfMonth() + "," + date.getYear();
         try {
             values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_LOCATION, locStr);
-            System.out.println(location.getLatLng().toString());
             values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME, dateString);
         } catch (Exception e) {
 
@@ -126,6 +141,47 @@ public class MakeReport extends Activity {
         long newRowId = db.insert(LostPuppy.LostPuppyEntry.TABLE_NAME, null, values);
         finish();
     }
+
+
+    public boolean isMatch() {
+        LostPuppyDbHelper dbHelper = new LostPuppyDbHelper(this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String[] projection = {
+                LostPuppy.LostPuppyEntry._ID,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_NAME,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_BREED,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_SEX,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_FUR_COLOR,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_LOCATION,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_EYE,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND
+        };
+
+        String selection = LostPuppy.LostPuppyEntry.COLUMN_NAME_NAME + " == ? AND " +
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_SEX + " == ? AND " +
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_FUR_COLOR + " == ? AND " +
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND + " != ?";
+        String[] selectionArgs = {name.getText().toString(),
+                findViewById(sex.getCheckedRadioButtonId()).getContentDescription().toString(),
+                fur.getText().toString(),
+                findViewById(lostfound.getCheckedRadioButtonId()).getContentDescription().toString()
+        };
+
+        String sortOrder = LostPuppy.LostPuppyEntry._ID + " ASC";
+
+        c = db.query(
+                LostPuppy.LostPuppyEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        return c.moveToFirst();
+    }
+
 
 }
 
