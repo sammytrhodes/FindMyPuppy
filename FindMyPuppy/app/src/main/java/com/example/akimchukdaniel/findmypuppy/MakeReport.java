@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
@@ -100,6 +101,19 @@ public class MakeReport extends Activity {
     }
 
     public void submit(View view) {
+        if (lostfound.getCheckedRadioButtonId() == -1 ||
+                name.getText().toString().equals("") ||
+                breed.getText().toString().equals("") ||
+                fur.getText().toString().equals("") ||
+                eye.getText().toString().equals("") ||
+                location == null ||
+                sex.getCheckedRadioButtonId() == -1) {
+            Toast error = Toast.makeText(getApplicationContext(), "Missing info", Toast.LENGTH_SHORT);
+            error.show();
+            return;
+        }
+
+
         if (isMatch()) {
             PuppyDialogFragment dialogFragment = new PuppyDialogFragment();
             dialogFragment.show(getFragmentManager(), "We found a puppy!!");
