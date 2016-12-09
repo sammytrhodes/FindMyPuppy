@@ -1,6 +1,7 @@
 package com.example.akimchukdaniel.findmypuppy;
 
 import android.app.Activity;
+import android.app.LauncherActivity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -55,7 +56,6 @@ public class ListActivity extends Activity {
             cameFromMap = true;
             startActivity(intent);
         }*/
-
     }
 
     @Override

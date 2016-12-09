@@ -29,18 +29,23 @@ public class SettingsActivity extends Activity {
 
         switch (preferences.getString("bgColor", "white")) {
             case "white":
+                bgColor.check(R.id.white);
                 layout.setBackgroundColor(getResources().getColor(R.color.white));
                 break;
             case "magenta":
+                bgColor.check(R.id.magenta);
                 layout.setBackgroundColor(getResources().getColor(R.color.magenta));
                 break;
             case "blue":
+                bgColor.check(R.id.blue);
                 layout.setBackgroundColor(getResources().getColor(R.color.blue));
                 break;
             case "orange":
+                bgColor.check(R.id.orange);
                 layout.setBackgroundColor(getResources().getColor(R.color.orange));
                 break;
             case "green":
+                bgColor.check(R.id.green);
                 layout.setBackgroundColor(getResources().getColor(R.color.green));
                 break;
         }
@@ -51,6 +56,12 @@ public class SettingsActivity extends Activity {
 
         if (!preferences.getString("phone", "").equals("")) {
             phone.setText(preferences.getString("phone", ""));
+        }
+
+        if (preferences.getString("defaultView", "").equals("map")) {
+            defaultView.check(R.id.defaultToMap);
+        } else {
+            defaultView.check(R.id.defaultToList);
         }
     }
 
