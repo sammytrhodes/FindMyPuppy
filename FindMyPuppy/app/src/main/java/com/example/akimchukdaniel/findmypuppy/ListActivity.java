@@ -40,7 +40,7 @@ public class ListActivity extends Activity {
 
     ListView listView;
     List<LostPuppy> puppyList;
-    boolean cameFromMap = false;
+    static boolean cameFromMap = false;
     Menu menu;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,21 +49,23 @@ public class ListActivity extends Activity {
         //initData();
         listView = (ListView) findViewById(R.id.listView);
         initializePuppyList(new String[]{""});
-        SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
-        /*
-        if (preferences.getString("defaultView", "list").equals("map") && !cameFromMap) {
-            Intent intent = new Intent(this, MapsActivity.class);
-            cameFromMap = true;
-            startActivity(intent);
-        }*/
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         initializePuppyList(new String[]{""});
-        LinearLayout layout = (LinearLayout) findViewById(R.id.listLayout);
+
         SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
+
+        if (preferences.getString("defaultView", "list").equals("map") && !cameFromMap) {
+            Intent intent = new Intent(this, MapsActivity.class);
+            cameFromMap = true;
+            startActivity(intent);
+        }
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.listLayout);
 
         switch (preferences.getString("bgColor", "white")) {
             case "white":
@@ -203,6 +205,7 @@ public class ListActivity extends Activity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                cameFromMap = false;
                 Intent intent = new Intent(getApplicationContext(), PuppyDetailActivity.class);
                 intent.putExtra("id", mPuppyAdapter.getItem(i).getId());
                 intent.putExtra("name", mPuppyAdapter.getItem(i).getName());
@@ -279,16 +282,19 @@ public class ListActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.add:
+                cameFromMap = false;
                 Intent intent = new Intent(this, MakeReport.class);
                 startActivity(intent);
                 return true;
 
             case R.id.mapButton:
+                cameFromMap = true;
                 Intent mapsIntent = new Intent(this, MapsActivity.class);
                 startActivity(mapsIntent);
                 return true;
 
             case R.id.settings:
+                cameFromMap = false;
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
                 return true;
