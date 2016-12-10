@@ -11,7 +11,18 @@ import android.os.Bundle;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Created by akimchukdaniel on 12/4/16.
+ * This is a fragment class for the dialog alert that will pop up when there is a match between
+ * reports.
+ */
 public class PuppyDialogFragment extends DialogFragment {
+    /**
+     * Called when the Dialog is created. Defines the message of the alert and the handlers for
+     * pressing either Take me to the puppy! or No thanks
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction

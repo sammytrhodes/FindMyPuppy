@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,11 +29,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.*;
 
+/**
+ * Created by akimchukdaniel on 12/4/16.
+ * Activity class for the map. Displays markers for all puppy reports.
+ */
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private List<LostPuppy> puppies;
 
+    /**
+     * Called when the activity is created. Initializes the map fragment.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +62,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
+     *
+     * Also places markers on the map for each puppy.
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -70,26 +82,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         mMap.setMyLocationEnabled(true);
 
-        // Add a marker in Sydney and move the camera
+        //Add a marker for each puppy.
         initializePuppyList();
         for (LostPuppy puppy : puppies) {
             LatLng location = puppy.getLocation();
             String lostfound = puppy.getLostfound();
-            if (lostfound.equals("LOST")) {
+            if (lostfound.equals("LOST")) { //azure marker for lost puppies
                 mMap.addMarker(new MarkerOptions()
                         .position(location)
                         .title(lostfound)
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-            } else {
+            } else { //magenta marker for found puppies
                 mMap.addMarker(new MarkerOptions()
                         .position(location)
                         .title(lostfound)
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
-
             }
         }
     }
 
+    /**
+     * Sets up the list of puppies from the database.
+     */
     public void initializePuppyList() {
         puppies = new ArrayList<>();
 

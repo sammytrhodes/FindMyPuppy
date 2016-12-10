@@ -7,6 +7,7 @@ import com.example.akimchukdaniel.findmypuppy.LostPuppy.LostPuppyEntry;
 
 /**
  * Created by akimchukdaniel on 12/1/16.
+ * A helper class that simplifies interactions with the SQLite database.
  */
 
 public class LostPuppyDbHelper extends SQLiteOpenHelper {

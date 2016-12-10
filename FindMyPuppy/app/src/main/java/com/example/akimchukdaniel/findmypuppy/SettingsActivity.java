@@ -10,11 +10,19 @@ import android.widget.RadioGroup;
 
 /**
  * Created by akimchukdaniel on 12/6/16.
+ * Activity for the Settings page. Allows the user to set various preferences that will persist
+ * throughout the app.
  */
 
 public class SettingsActivity extends Activity {
     EditText name, phone;
     RadioGroup bgColor, defaultView;
+
+    /**
+     * Called when the Activity is created. Inflates the view and creates pointers to various views.
+     * Sets background color. Autofills the settings with any information already entered.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,9 +73,12 @@ public class SettingsActivity extends Activity {
         }
     }
 
+    /**
+     * Called when the Activity is closed. Saves all the preferences in SharedPreferences.
+     */
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
         preferences.edit().putString("name", name.getText().toString())
                 .putString("bgColor", ((RadioButton)findViewById(bgColor.getCheckedRadioButtonId())).getContentDescription().toString())
