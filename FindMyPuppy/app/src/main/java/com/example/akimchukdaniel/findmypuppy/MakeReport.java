@@ -3,9 +3,9 @@ package com.example.akimchukdaniel.findmypuppy;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -14,21 +14,20 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.Date;
-
 import static android.content.ContentValues.TAG;
 
 /**
  * Created by akimchukdaniel on 12/4/16.
+ * Activity class for making reports of lost or found puppies.
+ * Allows users to make a report of a lost or found puppy, entering information which will
+ * be inputted into the database.
  */
 
 public class MakeReport extends Activity {
@@ -38,7 +37,14 @@ public class MakeReport extends Activity {
     Place location;
     DatePicker date;
     Button submit;
+    Cursor c;
 
+    /**
+     * Called when the Activity is created. Inflates the view, creates a pointer to the Google
+     * Maps PlaceAutocompleteFragment and defines listeners for the fragment. Creates all other
+     * pointers to views. Sets background color to the preferred color.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +61,6 @@ public class MakeReport extends Activity {
 
             @Override
             public void onError(Status status) {
-                // TODO: Handle the error.
                 Log.i(TAG, "An error occurred: " + status);
             }
         });
@@ -71,7 +76,7 @@ public class MakeReport extends Activity {
         LinearLayout layout = (LinearLayout) findViewById(R.id.reportLayout);
         SharedPreferences preferences = getSharedPreferences("preferences", MODE_PRIVATE);
 
-        switch (preferences.getString("bgColor", "white")) {
+        switch (preferences.getString("bgColor", "white")) { //set background to preferred color
             case "white":
                 layout.setBackgroundColor(getResources().getColor(R.color.white));
                 break;
@@ -91,7 +96,37 @@ public class MakeReport extends Activity {
 
     }
 
+    /**
+     * Called when the submit button is clicked. Ensures all info is inputted (if not, prompts
+     * the user to finish entering data). If it is, notifies the user if this report matches
+     * an existing report. If it does not, submits this report to the database.
+     * @param view
+     */
     public void submit(View view) {
+        //make sure all data is entered.
+        if (lostfound.getCheckedRadioButtonId() == -1 ||
+                name.getText().toString().equals("") ||
+                breed.getText().toString().equals("") ||
+                fur.getText().toString().equals("") ||
+                eye.getText().toString().equals("") ||
+                location == null ||
+                sex.getCheckedRadioButtonId() == -1) {
+            Toast error = Toast.makeText(getApplicationContext(), "Missing info",
+                    Toast.LENGTH_SHORT);
+            error.show();
+            return;
+        }
+
+        //if the puppy is match, tell the user and give them the opportunity to go to the match's
+        //report.
+        if (isMatch()) {
+            PuppyDialogFragment dialogFragment = new PuppyDialogFragment();
+            dialogFragment.show(getFragmentManager(), "We found a puppy!!");
+            return;
+        }
+
+        //Put all the info into a new row of the database.
+
         LostPuppyDbHelper dbHelper = new LostPuppyDbHelper(this);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -104,7 +139,6 @@ public class MakeReport extends Activity {
         String dateString = date.getMonth() + "," + date.getDayOfMonth() + "," + date.getYear();
         try {
             values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_LOCATION, locStr);
-            System.out.println(location.getLatLng().toString());
             values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME, dateString);
         } catch (Exception e) {
 
@@ -122,10 +156,67 @@ public class MakeReport extends Activity {
                 break;
         }
 
+        SharedPreferences sp = getSharedPreferences("preferences", MODE_PRIVATE);
+        values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_PHONE, sp.getString("phone", ""));
+        values.put(LostPuppy.LostPuppyEntry.COLUMN_NAME_REPORTER, sp.getString("name", "Anonymous"));
+
+
+
 
         long newRowId = db.insert(LostPuppy.LostPuppyEntry.TABLE_NAME, null, values);
+        //go back to the list
         finish();
     }
+
+
+    /**
+     * Checks the database to see if there is a report that matches the information inputted
+     * in the current report.
+     * A match has the same name, sex, and fur color, and opposite lost/found status
+     * @return true if there is, false otherwise
+     */
+    public boolean isMatch() {
+        LostPuppyDbHelper dbHelper = new LostPuppyDbHelper(this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String[] projection = {
+                LostPuppy.LostPuppyEntry._ID,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_NAME,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_BREED,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_SEX,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_FUR_COLOR,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_LOCATION,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_EYE,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_PHONE,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_REPORTER
+        };
+
+        String selection = LostPuppy.LostPuppyEntry.COLUMN_NAME_NAME + " == ? AND " +
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_SEX + " == ? AND " +
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_FUR_COLOR + " == ? AND " +
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND + " != ?";
+        String[] selectionArgs = {name.getText().toString(),
+                findViewById(sex.getCheckedRadioButtonId()).getContentDescription().toString(),
+                fur.getText().toString(),
+                findViewById(lostfound.getCheckedRadioButtonId()).getContentDescription().toString()
+        };
+
+        String sortOrder = LostPuppy.LostPuppyEntry._ID + " ASC";
+
+        c = db.query(
+                LostPuppy.LostPuppyEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        return c.moveToFirst(); //this returns true if there's at least one row, aka if there is
+                                //matching report.
+    }
+
 
 }
 

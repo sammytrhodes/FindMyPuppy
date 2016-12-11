@@ -27,12 +27,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/lostbutton"
-            android:text="Lost Puppy Report"/>
+            android:text="Lost Puppy Report"
+            android:contentDescription="LOST"/>
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/foundbutton"
-            android:text="Found Puppy Report"/>
+            android:text="Found Puppy Report"
+            android:contentDescription="FOUND"/>
     </RadioGroup>
 
     <TextView

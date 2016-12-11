@@ -7,6 +7,7 @@ import com.example.akimchukdaniel.findmypuppy.LostPuppy.LostPuppyEntry;
 
 /**
  * Created by akimchukdaniel on 12/1/16.
+ * A helper class that simplifies interactions with the SQLite database.
  */
 
 public class LostPuppyDbHelper extends SQLiteOpenHelper {
@@ -21,13 +22,15 @@ public class LostPuppyDbHelper extends SQLiteOpenHelper {
                     LostPuppyEntry.COLUMN_NAME_FUR_COLOR + " TEXT," +
                     LostPuppyEntry.COLUMN_NAME_EYE + " TEXT," +
                     LostPuppyEntry.COLUMN_NAME_LAST_LOCATION + " TEXT," +
-                    LostPuppyEntry.COLUMN_NAME_LAST_TIME + " TEXT )";
+                    LostPuppyEntry.COLUMN_NAME_LAST_TIME + " TEXT," +
+                    LostPuppyEntry.COLUMN_NAME_PHONE + " TEXT," +
+                    LostPuppyEntry.COLUMN_NAME_REPORTER + " TEXT )";
 
     private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + LostPuppyEntry.TABLE_NAME;
 
 
     public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "LostPuppiesNEWwithlostfound.db";
+    public static final String DATABASE_NAME = "LostPuppiesNEWwithlostfoundandreporters.db";
 
 
     public LostPuppyDbHelper(Context context) {
