@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">FindMyPuppy</string>
     <string name="title_activity_maps">Map</string>
+    <string name="thisisa">This is a:</string>
+    <string name="enterinfo">Enter any information you have:</string>
+    <string name="lastlocation">Location Last Seen:</string>
+    <string name="lastdate">Date Last Seen:</string>
 </resources>

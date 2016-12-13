@@ -98,11 +98,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
             }
         }
+        //set marker click listener to go to the detail view for the puppy
         mMap.setOnMarkerClickListener(this);
     }
-    public boolean onMarkerClick(Marker marker) {
 
+    /**
+     * Listener to go to the puppy detail activity for the corresponding puppy of markers.
+     * @param marker the marker the user clicked on
+     * @return true
+     */
+    public boolean onMarkerClick(Marker marker) {
+        //get the location string in the same format as the database has it
         String location = marker.getPosition().latitude + "," +  marker.getPosition().longitude;
+
+        //make a db object
         LostPuppyDbHelper puppers = new LostPuppyDbHelper(this);
         SQLiteDatabase db = puppers.getReadableDatabase();
         String[] projection = {
@@ -118,6 +127,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LostPuppy.LostPuppyEntry.COLUMN_NAME_PHONE,
                 LostPuppy.LostPuppyEntry.COLUMN_NAME_REPORTER
         };
+        //the selection makes sure the location in the db matches the location of the marker
         String selection = LostPuppy. LostPuppyEntry.COLUMN_NAME_LAST_LOCATION + "= ?";
         String[] selectionArgs = {location};
 
@@ -133,6 +143,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 sortOrder
         );
         c.moveToFirst();
+
+        //set up the intent with the information from the matching point.
         Intent clickInt = new Intent(this, PuppyDetailActivity.class);
         clickInt.putExtra("id", c.getInt(c.getColumnIndex(LostPuppy.LostPuppyEntry._ID)));
         clickInt.putExtra("name", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_NAME)));
@@ -146,24 +158,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         clickInt.putExtra("phone", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_PHONE)));
         clickInt.putExtra("reporter", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_REPORTER)));
         startActivity(clickInt);
-//        // Retrieve the data from the marker.
-//        Integer clickCount = (Integer) marker.getTag();
-//
-//        // Check if a click count was set, then display the click count.
-//        if (clickCount != null) {
-//            clickCount = clickCount + 1;
-//            marker.setTag(clickCount);
-//            Toast.makeText(this,
-//                    marker.getTitle() +
-//                            " has been clicked " + clickCount + " times.",
-//                    Toast.LENGTH_SHORT).show();
-//        }
-//
-//        // Return false to indicate that we have not consumed the event and that we wish
-//        // for the default behavior to occur (which is for the camera to move such that the
-//        // marker is centered and for the marker's info window to open, if it has one).
         return true;
     }
+
     /**
      * Sets up the list of puppies from the database.
      */

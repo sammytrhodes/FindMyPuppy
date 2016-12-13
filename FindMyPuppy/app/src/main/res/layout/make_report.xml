@@ -13,11 +13,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
     <TextView
-        android:text="TextView"
         android:id="@+id/thisisa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="This is a:" />
+        android:text="@string/thisisa" />
 
     <RadioGroup
         android:layout_width="wrap_content"
@@ -38,11 +37,10 @@
     </RadioGroup>
 
     <TextView
-        android:text="TextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textView2"
-        tools:text="Enter any information you have:" />
+        android:text="@string/enterinfo" />
     <EditText
         android:layout_width="150dp"
         android:layout_height="wrap_content"
@@ -65,7 +63,7 @@
         android:hint = "Eye Color"/>
 
     <TextView
-        android:text="Location Last Seen:"
+        android:text="@string/lastlocation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textView3" />
@@ -79,7 +77,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Date Last Seen:"/>
+        android:text="@string/lastdate"/>
     <DatePicker
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
