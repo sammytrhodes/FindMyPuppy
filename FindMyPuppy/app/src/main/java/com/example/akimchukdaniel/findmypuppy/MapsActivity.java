@@ -1,40 +1,33 @@
 package com.example.akimchukdaniel.findmypuppy;
 
-import android.*;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.jar.*;
 
 /**
  * Created by akimchukdaniel on 12/4/16.
  * Activity class for the map. Displays markers for all puppy reports.
  */
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
+        GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
     private List<LostPuppy> puppies;
@@ -87,20 +80,90 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for (LostPuppy puppy : puppies) {
             LatLng location = puppy.getLocation();
             String lostfound = puppy.getLostfound();
+            String name = puppy.getName();
+            String breed= puppy.getBreed();
+            String color = puppy.getFur();
+            String gender = puppy.getSex();
             if (lostfound.equals("LOST")) { //azure marker for lost puppies
                 mMap.addMarker(new MarkerOptions()
                         .position(location)
                         .title(lostfound)
+                        .snippet(name + ", "  + color + " " + breed + ", " + gender )
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
             } else { //magenta marker for found puppies
                 mMap.addMarker(new MarkerOptions()
                         .position(location)
                         .title(lostfound)
+                        .snippet(color + " " + breed + ", " + gender)
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
             }
         }
+        mMap.setOnMarkerClickListener(this);
     }
+    public boolean onMarkerClick(Marker marker) {
 
+        String location = marker.getPosition().latitude + "," +  marker.getPosition().longitude;
+        LostPuppyDbHelper puppers = new LostPuppyDbHelper(this);
+        SQLiteDatabase db = puppers.getReadableDatabase();
+        String[] projection = {
+                LostPuppy.LostPuppyEntry._ID,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_NAME,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_BREED,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_SEX,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_FUR_COLOR,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_LOCATION,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_EYE,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_PHONE,
+                LostPuppy.LostPuppyEntry.COLUMN_NAME_REPORTER
+        };
+        String selection = LostPuppy. LostPuppyEntry.COLUMN_NAME_LAST_LOCATION + "= ?";
+        String[] selectionArgs = {location};
+
+        String sortOrder = LostPuppy.LostPuppyEntry._ID + " ASC";
+
+        Cursor c = db.query(
+                LostPuppy.LostPuppyEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        c.moveToFirst();
+        Intent clickInt = new Intent(this, PuppyDetailActivity.class);
+        clickInt.putExtra("id", c.getInt(c.getColumnIndex(LostPuppy.LostPuppyEntry._ID)));
+        clickInt.putExtra("name", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_NAME)));
+        clickInt.putExtra("breed", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_BREED)));
+        clickInt.putExtra("fur", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_FUR_COLOR)));
+        clickInt.putExtra("sex", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_SEX)));
+        clickInt.putExtra("eye", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_EYE)));
+        clickInt.putExtra("location", location);
+        clickInt.putExtra("date", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_LAST_TIME)).replace(",", "/"));
+        clickInt.putExtra("lostfound", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_LOSTFOUND)));
+        clickInt.putExtra("phone", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_PHONE)));
+        clickInt.putExtra("reporter", c.getString(c.getColumnIndex(LostPuppy.LostPuppyEntry.COLUMN_NAME_REPORTER)));
+        startActivity(clickInt);
+//        // Retrieve the data from the marker.
+//        Integer clickCount = (Integer) marker.getTag();
+//
+//        // Check if a click count was set, then display the click count.
+//        if (clickCount != null) {
+//            clickCount = clickCount + 1;
+//            marker.setTag(clickCount);
+//            Toast.makeText(this,
+//                    marker.getTitle() +
+//                            " has been clicked " + clickCount + " times.",
+//                    Toast.LENGTH_SHORT).show();
+//        }
+//
+//        // Return false to indicate that we have not consumed the event and that we wish
+//        // for the default behavior to occur (which is for the camera to move such that the
+//        // marker is centered and for the marker's info window to open, if it has one).
+        return true;
+    }
     /**
      * Sets up the list of puppies from the database.
      */
